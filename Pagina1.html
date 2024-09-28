@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASTROBOY</title>
+    <style>
+        body {
+            background-color: #181818;
+            font-family: 'Fantasy', sans-serif;
+            color: #E0E0E0;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        h1 {
+            color: #FF4081;
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #FF4081;
+        }
+
+        .container {
+            background-color: #232323;
+            border: 2px solid #FF4081;
+            padding: 40px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            box-shadow: 0 0 20px rgba(255, 64, 129, 0.5);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .help-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #FF4081;
+            border: none;
+            padding: 8px;
+            color: #FFFFFF;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        input[type="text"] {
+            background-color: #282828;
+            border: 2px solid #FF4081;
+            color: #E0E0E0;
+            padding: 12px;
+            border-radius: 5px;
+            font-size: 1.2em;
+            width: 100%;
+            margin-bottom: 10px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #FF80AB;
+            outline: none;
+        }
+
+        button {
+            background-color: #FF4081;
+            border: none;
+            padding: 12px 24px;
+            color: #FFFFFF;
+            font-size: 1.2em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #FF80AB;
+        }
+
+        .resultado {
+            font-size: 1.5em;
+            color: #E0E0E0;
+            margin-top: 20px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .sugestoes {
+            background-color: #282828;
+            border: 2px solid #FF4081;
+            color: #E0E0E0;
+            position: absolute;
+            z-index: 10;
+            width: 100%;
+            display: none;
+            max-height: 150px;
+            overflow-y: auto;
+            bottom: 80px;
+            left: 0;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .sugestao {
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .sugestao:hover {
+            background-color: #FF4081;
+            color: #000000;
+        }
+
+        .lista-jogadores {
+            text-align: left;
+            padding-top: 10px;
+            font-size: 1em;
+            color: #E0E0E0;
+            display: none;
+            max-height: 200px;
+            overflow-y: auto;
+            width: 100%;
+            border: 2px solid #FF4081;
+            border-radius: 5px;
+            background-color: #2B2B2B;
+            margin-top: 10px;
+            box-sizing: border-box;
+        }
+
+        .jogador {
+            margin: 10px 0;
+            text-align: left;
+            background-color: #2B2B2B;
+            border: 1px solid #FF4081;
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        .help-message {
+            display: none;
+            background-color: #2B2B2B;
+            border: 2px solid #FF4081;
+            color: #E0E0E0;
+            padding: 10px;
+            border-radius: 0px;
+            position: absolute;
+            top: 30px;
+            left: 40px;
+            z-index: 20;
+            width: 300px;
+            text-align: left;
+        }
+    </style>
+    <script>
+        const jogadores = [
+            { uid: 'BCC7284385222491', nome: 'Astroboy' },
+            { uid: '39264BA20EC23240', nome: 'Dig Bom' },
+            { uid: 'C0396190287C2281', nome: 'Emilly Vitoria' },
+            { uid: 'CF9F824F3521822F', nome: 'Breeze' },
+            { uid: '3698E8EF9459D175', nome: 'Klaus' },
+            { uid: '907283099618E7', nome: 'Balawalls' },
+            { uid: 'CROFA24F3521822F', nome: 'Breeze 2' },
+            { uid: 'A383062389901780', nome: 'Tuê' },
+            { uid: 'A57EB8BC9FCB514C', nome: 'Revoltado' },
+            { uid: '68F08BECD3D08A3', nome: 'Azkaban' },
+            { uid: '68F08BECD3D08A3', nome: 'Tsudam' },
+            { uid: '1568F9757C79F891', nome: 'eo Bope 发' },
+            { uid: '16D4FA7341C6D3DE', nome: 'Lkzinho' },
+            { uid: '2128740E65403D51', nome: 'Pv' },
+            { uid: '4C33D0EF367D7FFB', nome: 'Mudinha' },
+            { uid: '97FACE276D8256B0', nome: 'Nazuga' },
+            { uid: 'C26F1346724B448', nome: 'Pandinha Fox' },
+            { uid: 'E69477A065E7C3BC', nome: 'Mata-Pato' },
+            { uid: 'FE1669615866D7CA', nome: 'Gaby' },
+            { uid: '5FB3A6976DD8846F', nome: 'Bigmonster' },
+            { uid: '6881956661F249F2', nome: 'Megan Fox' },
+            { uid: 'COE38267ACF609A9', nome: 'Perigoso' },
+            { uid: '7DCCA00897AC2024', nome: 'Narcisista' },
+            { uid: '61FD1CF3C0DC1242', nome: 'Codorna' },
+            { uid: 'DB41F836773C5FBA', nome: 'Cibernetico' },
+            { uid: '6AAD9B63902E1BD9', nome: 'AnonymoYT' },
+            { uid: '80265F0801C70927', nome: 'Fradex YT' },
+            { uid: 'C0E38257ACF609A9', nome: 'Chazy' },
+            { uid: 'F227892298C32707', nome: 'Do Mal' },
+            { uid: '837E0BD90547FC99', nome: 'Max' },
+            { uid: '5F017C3D43F87E6A', nome: 'Padaria' },
+            { uid: '762FC084630F0D62', nome: 'Anjin Pcm' },
+            { uid: '16D4FA7341C6D3DE', nome: 'Nicolas' },
+            { uid: '29EF14AFED68A6E6', nome: 'JB' },
+            { uid: 'DBD2C5E082D63653', nome: 'Perigoso' },
+            { uid: 'EF5307C6632FE462', nome: 'Chefinho' },
+            { uid: 'B2BDC89CE673F581', nome: 'Amigavel' },
+            { uid: 'SKKSKSJSSK', nome: 'NDNDNDNDNND' },
+            { uid: 'SKKSKSJSSK', nome: 'NDNDNDNDNND' },
+            { uid: 'SKKSKSJSSK', nome: 'NDNDNDNDNND' },
+            
+        
+        ];
+
+        let listaVisivel = false;
+
+        function buscarJogador() {
+            const pesquisa = document.getElementById('nome').value.toLowerCase();
+            if (pesquisa === '') {
+                document.getElementById('resultado').innerText = '';
+                return;
+            }
+
+            const jogadorEncontrado = jogadores.find(jogador => 
+                jogador.nome.toLowerCase().includes(pesquisa) || jogador.uid.toLowerCase().includes(pesquisa)
+            );
+
+            document.getElementById('sugestoes').style.display = 'none';
+            document.getElementById('lista-jogadores').style.display = 'none';
+            listaVisivel = false;
+
+            if (jogadorEncontrado) {
+                mostrarDetalhesJogador(jogadorEncontrado);
+            } else {
+                document.getElementById('resultado').innerText = 'Jogador não encontrado';
+            }
+        }
+
+        function mostrarOcultarLista() {
+            const listaDiv = document.getElementById('lista-jogadores');
+            document.getElementById('resultado').innerText = '';
+
+            if (listaVisivel) {
+                listaDiv.style.display = 'none';
+                listaVisivel = false;
+            } else {
+                listaDiv.style.display = 'block';
+                atualizarLista();
+                listaVisivel = true;
+            }
+        }
+
+        function atualizarLista() {
+            const listaDiv = document.getElementById('lista-jogadores');
+            listaDiv.innerHTML = '';
+
+            const jogadoresOrdenados = [...jogadores].sort((a, b) => a.nome.localeCompare(b.nome));
+
+            jogadoresOrdenados.forEach(jogador => {
+                listaDiv.innerHTML += `
+                    <div class="jogador">
+                        Nome: ${jogador.nome} <br>
+                        UID: ${jogador.uid}
+                    </div>
+                `;
+            });
+        }
+
+        function filtrarSugestoes() {
+            const input = document.getElementById('nome').value.toLowerCase();
+            const sugestaoDiv = document.getElementById('sugestoes');
+            sugestaoDiv.innerHTML = '';
+            let temSugestao = false;
+
+            jogadores.forEach(jogador => {
+                if (jogador.nome.toLowerCase().includes(input) || jogador.uid.toLowerCase().includes(input)) {
+                    const divSugestao = document.createElement('div');
+                    divSugestao.className = 'sugestao';
+                    divSugestao.innerText = `${jogador.nome} - UID: ${jogador.uid}`;
+                    divSugestao.onclick = () => {
+                        mostrarDetalhesJogador(jogador);
+                        sugestaoDiv.style.display = 'none';
+                    };
+                    sugestaoDiv.appendChild(divSugestao);
+                    temSugestao = true;
+                }
+            });
+
+            sugestaoDiv.style.display = input === '' ? 'none' : (temSugestao ? 'block' : 'none');
+            }
+
+        function mostrarDetalhesJogador(jogador) {
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.innerHTML = `
+                <div class="resultado">
+                    Nome: ${jogador.nome} <br>
+                    UID: ${jogador.uid}
+                </div>
+            `;
+        }
+
+        function mostrarAjuda() {
+            const ajudaDiv = document.getElementById('help-message');
+            ajudaDiv.style.display = ajudaDiv.style.display === 'block' ? 'none' : 'block';
+        }
+
+        document.addEventListener('click', function(event) {
+            const ajudaDiv = document.getElementById('help-message');
+            const ajudaBotao = document.querySelector('.help-button');
+            if (event.target !== ajudaBotao && ajudaDiv.style.display === 'block') {
+                ajudaDiv.style.display = 'none';
+            }
+        });
+    </script>
+</head>
+<body>
+    <h1>MIMICRY</h1>
+    <div class="container">
+        <button class="help-button" onclick="mostrarAjuda()">Ajuda</button>
+        <label for="nome">NOME/NICK/UID:</label>
+        <br>
+        <input type="text" id="nome" placeholder="" oninput="filtrarSugestoes()">
+        <div id="sugestoes" class="sugestoes"></div>
+        <br>
+        <button onclick="buscarJogador()">Buscar</button>
+        <br><br>
+        <button onclick="window.location.href='lista-jogadores.html'">Lista de jogadores</button>
+    </div>
+    <div id="resultado"></div> 
+    <div id="lista-jogadores" class="lista-jogadores"></div>
+    <div id="help-message" class="help-message">
+        1-Ao invés de digitar o UID completo, escreva parte dele (Exemplo: de A57EBUBSJSHEO38, escreva "A57" que sua busca vai ser feita. Tanto faz a ordem, pode ser início, meio ou fim.
+    </div>
+</body>
+</html>
